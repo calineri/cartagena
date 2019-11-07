@@ -5,6 +5,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.content.Intent;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -21,7 +23,27 @@ public class MainActivity extends AppCompatActivity {
         btnOpcoes = findViewById(R.id.btnOpcoes);
         btnSair = findViewById(R.id.btnSair);
 
-        
+        btnJogar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent jogar = new Intent(MainActivity.this, Entrar.class);
+                startActivity(jogar);
+            }
+        });
 
+        btnOpcoes.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent opcoes = new Intent(MainActivity.this, Opcoes.class);
+                startActivity(opcoes);
+            }
+        });
+
+        btnSair.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                System.exit(0);
+            }
+        });
     }
 }
