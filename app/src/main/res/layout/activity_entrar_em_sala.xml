@@ -4,44 +4,45 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.br.senac.ppdm.cartagena.Entrar">
+    tools:context=".EntrarEmSala">
 
     <TextView
-        android:id="@+id/textEntrar"
-        android:layout_width="82dp"
-        android:layout_height="29dp"
+        android:id="@+id/textEntrarEmSala"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="100dp"
         android:layout_marginEnd="8dp"
-        android:text="Entrar"
-        android:textAlignment="center"
+        android:text="Entrar em uma Sala"
         android:textSize="20dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
-        android:id="@+id/btnEntrarEmSala"
-        android:layout_width="wrap_content"
+    <EditText
+        android:id="@+id/etNomeJogadorEntrarSala"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="80dp"
         android:layout_marginEnd="8dp"
-        android:text="Entrar em uma Sala"
+        android:ems="10"
+        android:hint="Digite seu nome do jogador"
+        android:inputType="textPersonName"
+        android:maxLength="8"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textEntrar" />
+        app:layout_constraintTop_toBottomOf="@+id/textEntrarEmSala" />
 
     <Button
-        android:id="@+id/btnCriarSala"
+        android:id="@+id/btnEntrar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="60dp"
         android:layout_marginEnd="8dp"
-        android:text="Criar uma sala"
+        android:text="Entrar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnEntrarEmSala" />
+        app:layout_constraintTop_toBottomOf="@+id/etNomeJogadorEntrarSala" />
 </androidx.constraintlayout.widget.ConstraintLayout>
