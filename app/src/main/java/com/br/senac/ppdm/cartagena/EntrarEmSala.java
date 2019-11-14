@@ -13,7 +13,7 @@ import br.com.senac.pdm.mepresidenta.lobby.EscolherJogoActivity;
 public class EntrarEmSala extends AppCompatActivity {
 
     EditText etNomeJogador;
-    Button btnEntrarSala;
+    Button btnEntrar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,9 +21,9 @@ public class EntrarEmSala extends AppCompatActivity {
         setContentView(R.layout.activity_entrar_em_sala);
 
         etNomeJogador = findViewById(R.id.etNomeJogadorEntrarSala);
-        btnEntrarSala = findViewById(R.id.btnEntrarEmSala);
+        btnEntrar = findViewById(R.id.btnEntrar);
 
-        btnEntrarSala.setOnClickListener(new View.OnClickListener() {
+        btnEntrar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(EntrarEmSala.this, EscolherJogoActivity.class);
