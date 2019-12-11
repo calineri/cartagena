@@ -208,6 +208,7 @@ public class JogoPrincipal extends AppCompatActivity {
         // Realiza a chamada e passa os parametros com as informações do jogador que ira realizar esta acao
         // passa tambem posicao origem do pirata a ser movido para frente e a carta que sera utilizada
         // recebe como retorno o status atual da partida
+        // TODO Alterar a posicao origem do pirata e a carta a ser utilizada por variaveis que serao escolhidas na tela
         statusAtual = andarFrente.postAndarFrente(autenticacao, "0", "E");
 
         statusAtual.enqueue(new Callback<Status>() {
@@ -246,6 +247,7 @@ public class JogoPrincipal extends AppCompatActivity {
         // Realiza a chamada e passa os parametros com as informações do jogador que ira realizar esta acao
         // passa tambem posicao origem do pirata a ser movido para tras
         // recebe como retorno o status atual da partida
+        // TODO Alterar a posicao origem do pirata por variavel que sera escolhida na tela
         statusAtual = andartras.postAndarTras(autenticacao, "6");
 
         statusAtual.enqueue(new Callback<Status>() {
