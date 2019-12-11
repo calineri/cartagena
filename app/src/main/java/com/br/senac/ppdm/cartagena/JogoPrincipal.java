@@ -12,6 +12,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import java.util.List;
 
 import retrofit2.Call;
@@ -34,12 +36,22 @@ public class JogoPrincipal extends AppCompatActivity {
     private ViewGroup containerH9;
     private ViewGroup containerH10;
 
+    private String idJogador;
+    private String nomeJogador;
+    private String senhaJogador;
+    private String idJogo;
+    private String nomeJogo;
+    private String senhaJogo;
+
+    private FloatingActionButton fabButton;
+
     // Variavel que contem o status atual do jogo
     private Call<Status> statusAtual;
 
-    // Cria os objetos que serao utilizados no POST nas mensagens que necessitam autenticacao do jogador
-    //TODO Alterar os parametros IDJOGADOR e SENHAJOGADOR pelas variaveis idJogador e senhaJogador respectivamente
-    private Autenticacao autenticacao = new Autenticacao(243, "C1B427");
+    // Objeto que sera utilizado no POST nas mensagens que necessitam autenticacao do jogador
+     private Autenticacao autenticacao;
+
+    private Status situacao;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,12 +61,20 @@ public class JogoPrincipal extends AppCompatActivity {
         // Obter informacoes do jogo atraves do SharedPreferences - informados pelo LOBBY
         SharedPreferences pref = getApplicationContext().getSharedPreferences("jogo", 0); // 0 - for private mode
 
-        String idJogador = pref.getString("idJogador","");
-        String nomeJogador = pref.getString("nomeJogador","");
-        String senhaJogador = pref.getString("senhaJogador","");
-        String idJogo = pref.getString("idJogo","");
-        String nomeJogo = pref.getString("nomeJogo","");
-        String senhaJogo = pref.getString("senhaJogo","");
+        this.idJogador = pref.getString("idJogador","");
+        this.nomeJogador = pref.getString("nomeJogador","");
+        this.senhaJogador = pref.getString("senhaJogador","");
+        this.idJogo = pref.getString("idJogo","");
+        this.nomeJogo = pref.getString("nomeJogo","");
+        this.senhaJogo = pref.getString("senhaJogo","");
+
+        // APENAS PARA TESTES, RETIRAR NA VERSAO FINAL
+        this.idJogo = "154";
+        this.idJogador = "244";
+        this.senhaJogador = "DFDEF8";
+        // APENAS PARA TESTES, RETIRAR NA VERSAO FINAL
+
+        this.autenticacao = new Autenticacao(Long.parseLong(idJogador), senhaJogador);
 
         containerH0 =  (ViewGroup) findViewById(R.id.containerH0);
         containerH1 =  (ViewGroup) findViewById(R.id.containerH1);
@@ -67,6 +87,8 @@ public class JogoPrincipal extends AppCompatActivity {
         containerH8 =  (ViewGroup) findViewById(R.id.containerH8);
         containerH9 =  (ViewGroup) findViewById(R.id.containerH9);
         containerH10 = (ViewGroup) findViewById(R.id.containerH10);
+
+        this.fabButton = (FloatingActionButton) findViewById(R.id.fabEdit);
 
         // Cria objeto Retrofit que sera utilizado em todas as chamadas webservice
         Retrofit retrofit = new Retrofit.Builder()
@@ -224,8 +246,7 @@ public class JogoPrincipal extends AppCompatActivity {
         ObterMaoJogador maoJogador = retrofit.create(ObterMaoJogador.class);
 
         // Cria objeto que ira realizar a chamada e passa o ID e senha do jogador como parametro
-        //TODO Alterar os parametros IDJOGADOR e SENHAJOGADOR pelas variaveis idJogador e senhaJogador respectivamente
-        Call<List<Carta>> cartasJogador = maoJogador.getMaoJogador("243", "C1B427");
+        Call<List<Carta>> cartasJogador = maoJogador.getMaoJogador(this.idJogador, this.senhaJogador);
 
         //Enfilera chamada do webservice e configura o callback
         cartasJogador.enqueue(new Callback<List<Carta>>() {
@@ -257,8 +278,7 @@ public class JogoPrincipal extends AppCompatActivity {
         ObterStatus status = retrofit.create(ObterStatus.class);
 
         //Cria objeto que ira realizar a chamada e passa o ID da partida como parametro
-        //TODO alterar o parametro IDJOGO para variavel idJogo
-        this.statusAtual = status.getStatus("154");
+        this.statusAtual = status.getStatus(this.idJogo);
 
         //Enfilera chamada do webservice e configura o callback
         this.statusAtual.enqueue(new Callback<Status>() {
@@ -269,6 +289,7 @@ public class JogoPrincipal extends AppCompatActivity {
                 } else {
                     // Obtem as informacoes do servico e guarda em uma referencia de objeto
                     Status situacao = response.body();
+                    informaSituacao(situacao);
 
                     System.out.println("***Status do jogo*** - ini");
                     System.out.println(situacao.getIdJogadorDaVez());
@@ -292,12 +313,15 @@ public class JogoPrincipal extends AppCompatActivity {
         });
     }
 
+    public void informaSituacao(Status situacao){
+        this.situacao = situacao;
+    }
+
     public void configuracaoInicial(Retrofit retrofit){
         // Cria objeto que sera chamado para obter as informacoes de configuracao do tabuleiro
         ObterConfTabuleiro confTabuleiro = retrofit.create(ObterConfTabuleiro.class);
 
         // Cria objeto que ira realizar a chamada e passa o ID da partida como parametro
-        //TODO alterar o parametro do ID JOGO para variavel idJogo
         Call<List<CasaTabuleiro>> casaTabuleiro = confTabuleiro.getConfTabuleiro("154");
 
         // Enfilera chamada do webservice e configura o callback
@@ -443,40 +467,61 @@ public class JogoPrincipal extends AppCompatActivity {
         CardView cardView = (CardView) LayoutInflater.from(this)
                 .inflate(R.layout.card_prisao, containerH0, false);
 
-        ImageView imgJog1Prisao1 = findViewById(R.id.imageJog1Prisao1);
-        ImageView imgJog1Prisao2 = findViewById(R.id.imageJog1Prisao2);
-        ImageView imgJog1Prisao3 = findViewById(R.id.imageJog1Prisao3);
-        ImageView imgJog1Prisao4 = findViewById(R.id.imageJog1Prisao4);
-        ImageView imgJog1Prisao5 = findViewById(R.id.imageJog1Prisao5);
-        ImageView imgJog1Prisao6 = findViewById(R.id.imageJog1Prisao6);
+        ImageView imgJog1Prisao1 = cardView.findViewById(R.id.imageJog1Prisao1);
+        ImageView imgJog1Prisao2 = cardView.findViewById(R.id.imageJog1Prisao2);
+        ImageView imgJog1Prisao3 = cardView.findViewById(R.id.imageJog1Prisao3);
+        ImageView imgJog1Prisao4 = cardView.findViewById(R.id.imageJog1Prisao4);
+        ImageView imgJog1Prisao5 = cardView.findViewById(R.id.imageJog1Prisao5);
+        ImageView imgJog1Prisao6 = cardView.findViewById(R.id.imageJog1Prisao6);
 
-        ImageView imgJog2Prisao1 = findViewById(R.id.imageJog2Prisao1);
-        ImageView imgJog2Prisao2 = findViewById(R.id.imageJog2Prisao2);
-        ImageView imgJog2Prisao3 = findViewById(R.id.imageJog2Prisao3);
-        ImageView imgJog2Prisao4 = findViewById(R.id.imageJog2Prisao4);
-        ImageView imgJog2Prisao5 = findViewById(R.id.imageJog2Prisao5);
-        ImageView imgJog2Prisao6 = findViewById(R.id.imageJog2Prisao6);
+        ImageView imgJog2Prisao1 = cardView.findViewById(R.id.imageJog2Prisao1);
+        ImageView imgJog2Prisao2 = cardView.findViewById(R.id.imageJog2Prisao2);
+        ImageView imgJog2Prisao3 = cardView.findViewById(R.id.imageJog2Prisao3);
+        ImageView imgJog2Prisao4 = cardView.findViewById(R.id.imageJog2Prisao4);
+        ImageView imgJog2Prisao5 = cardView.findViewById(R.id.imageJog2Prisao5);
+        ImageView imgJog2Prisao6 = cardView.findViewById(R.id.imageJog2Prisao6);
 
-        ImageView imgJog3Prisao1 = findViewById(R.id.imageJog3Prisao1);
-        ImageView imgJog3Prisao2 = findViewById(R.id.imageJog3Prisao2);
-        ImageView imgJog3Prisao3 = findViewById(R.id.imageJog3Prisao3);
-        ImageView imgJog3Prisao4 = findViewById(R.id.imageJog3Prisao4);
-        ImageView imgJog3Prisao5 = findViewById(R.id.imageJog3Prisao5);
-        ImageView imgJog3Prisao6 = findViewById(R.id.imageJog3Prisao6);
+        ImageView imgJog3Prisao1 = cardView.findViewById(R.id.imageJog3Prisao1);
+        ImageView imgJog3Prisao2 = cardView.findViewById(R.id.imageJog3Prisao2);
+        ImageView imgJog3Prisao3 = cardView.findViewById(R.id.imageJog3Prisao3);
+        ImageView imgJog3Prisao4 = cardView.findViewById(R.id.imageJog3Prisao4);
+        ImageView imgJog3Prisao5 = cardView.findViewById(R.id.imageJog3Prisao5);
+        ImageView imgJog3Prisao6 = cardView.findViewById(R.id.imageJog3Prisao6);
 
-        ImageView imgJog4Prisao1 = findViewById(R.id.imageJog4Prisao1);
-        ImageView imgJog4Prisao2 = findViewById(R.id.imageJog4Prisao2);
-        ImageView imgJog4Prisao3 = findViewById(R.id.imageJog4Prisao3);
-        ImageView imgJog4Prisao4 = findViewById(R.id.imageJog4Prisao4);
-        ImageView imgJog4Prisao5 = findViewById(R.id.imageJog4Prisao5);
-        ImageView imgJog4Prisao6 = findViewById(R.id.imageJog4Prisao6);
+        ImageView imgJog4Prisao1 = cardView.findViewById(R.id.imageJog4Prisao1);
+        ImageView imgJog4Prisao2 = cardView.findViewById(R.id.imageJog4Prisao2);
+        ImageView imgJog4Prisao3 = cardView.findViewById(R.id.imageJog4Prisao3);
+        ImageView imgJog4Prisao4 = cardView.findViewById(R.id.imageJog4Prisao4);
+        ImageView imgJog4Prisao5 = cardView.findViewById(R.id.imageJog4Prisao5);
+        ImageView imgJog4Prisao6 = cardView.findViewById(R.id.imageJog4Prisao6);
 
-        ImageView imgJog5Prisao1 = findViewById(R.id.imageJog5Prisao1);
-        ImageView imgJog5Prisao2 = findViewById(R.id.imageJog5Prisao2);
-        ImageView imgJog5Prisao3 = findViewById(R.id.imageJog5Prisao3);
-        ImageView imgJog5Prisao4 = findViewById(R.id.imageJog5Prisao4);
-        ImageView imgJog5Prisao5 = findViewById(R.id.imageJog5Prisao5);
-        ImageView imgJog5Prisao6 = findViewById(R.id.imageJog5Prisao6);
+        ImageView imgJog5Prisao1 = cardView.findViewById(R.id.imageJog5Prisao1);
+        ImageView imgJog5Prisao2 = cardView.findViewById(R.id.imageJog5Prisao2);
+        ImageView imgJog5Prisao3 = cardView.findViewById(R.id.imageJog5Prisao3);
+        ImageView imgJog5Prisao4 = cardView.findViewById(R.id.imageJog5Prisao4);
+        ImageView imgJog5Prisao5 = cardView.findViewById(R.id.imageJog5Prisao5);
+        ImageView imgJog5Prisao6 = cardView.findViewById(R.id.imageJog5Prisao6);
+
+        imgJog3Prisao1.setVisibility(View.INVISIBLE);
+        imgJog3Prisao2.setVisibility(View.INVISIBLE);
+        imgJog3Prisao3.setVisibility(View.INVISIBLE);
+        imgJog3Prisao4.setVisibility(View.INVISIBLE);
+        imgJog3Prisao5.setVisibility(View.INVISIBLE);
+        imgJog3Prisao6.setVisibility(View.INVISIBLE);
+
+        imgJog4Prisao1.setVisibility(View.INVISIBLE);
+        imgJog4Prisao2.setVisibility(View.INVISIBLE);
+        imgJog4Prisao3.setVisibility(View.INVISIBLE);
+        imgJog4Prisao4.setVisibility(View.INVISIBLE);
+        imgJog4Prisao5.setVisibility(View.INVISIBLE);
+        imgJog4Prisao6.setVisibility(View.INVISIBLE);
+
+        imgJog5Prisao1.setVisibility(View.INVISIBLE);
+        imgJog5Prisao2.setVisibility(View.INVISIBLE);
+        imgJog5Prisao3.setVisibility(View.INVISIBLE);
+        imgJog5Prisao4.setVisibility(View.INVISIBLE);
+        imgJog5Prisao5.setVisibility(View.INVISIBLE);
+        imgJog5Prisao6.setVisibility(View.INVISIBLE);
 
         containerH0.addView(cardView);
     }
@@ -485,40 +530,75 @@ public class JogoPrincipal extends AppCompatActivity {
         CardView cardView = (CardView) LayoutInflater.from(this)
                 .inflate(R.layout.card_barco, containerH10, false);
 
-        ImageView imgJog1Barco1 = findViewById(R.id.imageJog1Barco1);
-        ImageView imgJog1Barco2 = findViewById(R.id.imageJog1Barco2);
-        ImageView imgJog1Barco3 = findViewById(R.id.imageJog1Barco3);
-        ImageView imgJog1Barco4 = findViewById(R.id.imageJog1Barco4);
-        ImageView imgJog1Barco5 = findViewById(R.id.imageJog1Barco5);
-        ImageView imgJog1Barco6 = findViewById(R.id.imageJog1Barco6);
+        ImageView imgJog1Barco1 = cardView.findViewById(R.id.imageJog1Barco1);
+        ImageView imgJog1Barco2 = cardView.findViewById(R.id.imageJog1Barco2);
+        ImageView imgJog1Barco3 = cardView.findViewById(R.id.imageJog1Barco3);
+        ImageView imgJog1Barco4 = cardView.findViewById(R.id.imageJog1Barco4);
+        ImageView imgJog1Barco5 = cardView.findViewById(R.id.imageJog1Barco5);
+        ImageView imgJog1Barco6 = cardView.findViewById(R.id.imageJog1Barco6);
 
-        ImageView imgJog2Barco1 = findViewById(R.id.imageJog2Barco1);
-        ImageView imgJog2Barco2 = findViewById(R.id.imageJog2Barco2);
-        ImageView imgJog2Barco3 = findViewById(R.id.imageJog2Barco3);
-        ImageView imgJog2Barco4 = findViewById(R.id.imageJog2Barco4);
-        ImageView imgJog2Barco5 = findViewById(R.id.imageJog2Barco5);
-        ImageView imgJog2Barco6 = findViewById(R.id.imageJog2Barco6);
+        ImageView imgJog2Barco1 = cardView.findViewById(R.id.imageJog2Barco1);
+        ImageView imgJog2Barco2 = cardView.findViewById(R.id.imageJog2Barco2);
+        ImageView imgJog2Barco3 = cardView.findViewById(R.id.imageJog2Barco3);
+        ImageView imgJog2Barco4 = cardView.findViewById(R.id.imageJog2Barco4);
+        ImageView imgJog2Barco5 = cardView.findViewById(R.id.imageJog2Barco5);
+        ImageView imgJog2Barco6 = cardView.findViewById(R.id.imageJog2Barco6);
 
-        ImageView imgJog3Barco1 = findViewById(R.id.imageJog3Barco1);
-        ImageView imgJog3Barco2 = findViewById(R.id.imageJog3Barco2);
-        ImageView imgJog3Barco3 = findViewById(R.id.imageJog3Barco3);
-        ImageView imgJog3Barco4 = findViewById(R.id.imageJog3Barco4);
-        ImageView imgJog3Barco5 = findViewById(R.id.imageJog3Barco5);
-        ImageView imgJog3Barco6 = findViewById(R.id.imageJog3Barco6);
+        ImageView imgJog3Barco1 = cardView.findViewById(R.id.imageJog3Barco1);
+        ImageView imgJog3Barco2 = cardView.findViewById(R.id.imageJog3Barco2);
+        ImageView imgJog3Barco3 = cardView.findViewById(R.id.imageJog3Barco3);
+        ImageView imgJog3Barco4 = cardView.findViewById(R.id.imageJog3Barco4);
+        ImageView imgJog3Barco5 = cardView.findViewById(R.id.imageJog3Barco5);
+        ImageView imgJog3Barco6 = cardView.findViewById(R.id.imageJog3Barco6);
 
-        ImageView imgJog4Barco1 = findViewById(R.id.imageJog4Barco1);
-        ImageView imgJog4Barco2 = findViewById(R.id.imageJog4Barco2);
-        ImageView imgJog4Barco3 = findViewById(R.id.imageJog4Barco3);
-        ImageView imgJog4Barco4 = findViewById(R.id.imageJog4Barco4);
-        ImageView imgJog4Barco5 = findViewById(R.id.imageJog4Barco5);
-        ImageView imgJog4Barco6 = findViewById(R.id.imageJog4Barco6);
+        ImageView imgJog4Barco1 = cardView.findViewById(R.id.imageJog4Barco1);
+        ImageView imgJog4Barco2 = cardView.findViewById(R.id.imageJog4Barco2);
+        ImageView imgJog4Barco3 = cardView.findViewById(R.id.imageJog4Barco3);
+        ImageView imgJog4Barco4 = cardView.findViewById(R.id.imageJog4Barco4);
+        ImageView imgJog4Barco5 = cardView.findViewById(R.id.imageJog4Barco5);
+        ImageView imgJog4Barco6 = cardView.findViewById(R.id.imageJog4Barco6);
 
-        ImageView imgJog5Barco1 = findViewById(R.id.imageJog5Barco1);
-        ImageView imgJog5Barco2 = findViewById(R.id.imageJog5Barco2);
-        ImageView imgJog5Barco3 = findViewById(R.id.imageJog5Barco3);
-        ImageView imgJog5Barco4 = findViewById(R.id.imageJog5Barco4);
-        ImageView imgJog5Barco5 = findViewById(R.id.imageJog5Barco5);
-        ImageView imgJog5Barco6 = findViewById(R.id.imageJog5Barco6);
+        ImageView imgJog5Barco1 = cardView.findViewById(R.id.imageJog5Barco1);
+        ImageView imgJog5Barco2 = cardView.findViewById(R.id.imageJog5Barco2);
+        ImageView imgJog5Barco3 = cardView.findViewById(R.id.imageJog5Barco3);
+        ImageView imgJog5Barco4 = cardView.findViewById(R.id.imageJog5Barco4);
+        ImageView imgJog5Barco5 = cardView.findViewById(R.id.imageJog5Barco5);
+        ImageView imgJog5Barco6 = cardView.findViewById(R.id.imageJog5Barco6);
+
+        imgJog1Barco1.setVisibility(View.INVISIBLE);
+        imgJog1Barco2.setVisibility(View.INVISIBLE);
+        imgJog1Barco3.setVisibility(View.INVISIBLE);
+        imgJog1Barco4.setVisibility(View.INVISIBLE);
+        imgJog1Barco5.setVisibility(View.INVISIBLE);
+        imgJog1Barco6.setVisibility(View.INVISIBLE);
+
+        imgJog2Barco1.setVisibility(View.INVISIBLE);
+        imgJog2Barco2.setVisibility(View.INVISIBLE);
+        imgJog2Barco3.setVisibility(View.INVISIBLE);
+        imgJog2Barco4.setVisibility(View.INVISIBLE);
+        imgJog2Barco5.setVisibility(View.INVISIBLE);
+        imgJog2Barco6.setVisibility(View.INVISIBLE);
+
+        imgJog3Barco1.setVisibility(View.INVISIBLE);
+        imgJog3Barco2.setVisibility(View.INVISIBLE);
+        imgJog3Barco3.setVisibility(View.INVISIBLE);
+        imgJog3Barco4.setVisibility(View.INVISIBLE);
+        imgJog3Barco5.setVisibility(View.INVISIBLE);
+        imgJog3Barco6.setVisibility(View.INVISIBLE);
+
+        imgJog4Barco1.setVisibility(View.INVISIBLE);
+        imgJog4Barco2.setVisibility(View.INVISIBLE);
+        imgJog4Barco3.setVisibility(View.INVISIBLE);
+        imgJog4Barco4.setVisibility(View.INVISIBLE);
+        imgJog4Barco5.setVisibility(View.INVISIBLE);
+        imgJog4Barco6.setVisibility(View.INVISIBLE);
+
+        imgJog5Barco1.setVisibility(View.INVISIBLE);
+        imgJog5Barco2.setVisibility(View.INVISIBLE);
+        imgJog5Barco3.setVisibility(View.INVISIBLE);
+        imgJog5Barco4.setVisibility(View.INVISIBLE);
+        imgJog5Barco5.setVisibility(View.INVISIBLE);
+        imgJog5Barco6.setVisibility(View.INVISIBLE);
 
         containerH10.addView(cardView);
 

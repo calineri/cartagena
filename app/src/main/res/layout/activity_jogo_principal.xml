@@ -105,6 +105,7 @@
                 android:id="@+id/containerH10"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="235dp"
                 android:orientation="horizontal">
 
             </LinearLayout>
@@ -112,5 +113,23 @@
         </LinearLayout>
 
     </ScrollView>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabEdit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center|bottom"
+        android:layout_margin="20dp"
+        android:layout_marginEnd="4dp"
+        android:layout_marginBottom="16dp"
+        android:src="@android:drawable/ic_dialog_info"
+        app:backgroundTint="@color/design_default_color_primary"
+        app:borderWidth="0dp"
+        app:elevation="4dp"
+        app:fabSize="normal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:pressedTranslationZ="8dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
