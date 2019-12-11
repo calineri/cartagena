@@ -56,15 +56,25 @@ public class JogoPrincipal extends AppCompatActivity {
         containerH8 =  (ViewGroup) findViewById(R.id.containerH8);
         containerH9 =  (ViewGroup) findViewById(R.id.containerH9);
 
+        // Cria os objetos que serao utilizados no POST nas mensagens que necessitam
+        //TODO Alterar os parametros IDJOGADOR e SENHAJOGADOR pelas variaveis idJogador e senhaJogador respectivamente
+        Autenticacao autenticacao = new Autenticacao(243, "C1B427");
+
+        // Cria objeto Retrofit que sera utilizado em todas as chamadas webservice
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://kingme.azurewebsites.net/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
+        // fim da criacao do objeto
 
+        // Cria objeto que sera chamado para obter as informacoes de configuracao do tabuleiro
         ObterConfTabuleiro confTabuleiro = retrofit.create(ObterConfTabuleiro.class);
 
+        // Cria objeto que ira realizar a chamada e passa o ID da partida como parametro
+        //TODO alterar o parametro do ID JOGO para variavel idJogo
         Call<List<CasaTabuleiro>> casaTabuleiro = confTabuleiro.getConfTabuleiro("154");
 
+        // Enfilera chamada do webservice e configura o callback
         casaTabuleiro.enqueue(new Callback<List<CasaTabuleiro>>() {
             @Override
             public void onResponse(Call<List<CasaTabuleiro>> call, Response<List<CasaTabuleiro>> response) {
@@ -72,7 +82,9 @@ public class JogoPrincipal extends AppCompatActivity {
                 if (!response.isSuccessful()){
                     Toast.makeText(JogoPrincipal.this, "Deu erro: " + response.code(), Toast.LENGTH_LONG).show();
                 } else {
+                    // Obtem as informacoes do servico e guarda em uma lista
                     List<CasaTabuleiro> casas = response.body();
+                    // monta o tabuleiro a partir das informacoes retornadas no servico
                     montaTabuleiro(casas);
 
                 }
@@ -86,8 +98,189 @@ public class JogoPrincipal extends AppCompatActivity {
             }
         });
 
+        //Cria objeto que sera chamado para obter as informacoes de status do jogo
+        ObterStatus status = retrofit.create(ObterStatus.class);
+
+        //Cria objeto que ira realizar a chamada e passa o ID da partida como parametro
+        //TODO alterar o parametro IDJOGO para variavel idJogo
+        Call<Status> statusAtual = status.getStatus("154");
+
+        //Enfilera chamada do webservice e configura o callback
+        statusAtual.enqueue(new Callback<Status>() {
+            @Override
+            public void onResponse(Call<Status> call, Response<Status> response) {
+                if (!response.isSuccessful()){
+                    Toast.makeText(JogoPrincipal.this, "Deu erro: " + response.code(), Toast.LENGTH_LONG).show();
+                } else {
+                    // Obtem as informacoes do servico e guarda em uma referencia de objeto
+                    Status situacao = response.body();
+
+                    System.out.println(situacao.getIdJogadorDaVez());
+                    System.out.println(situacao.getNumeroDaJogada());
+                    System.out.println(situacao.getTabuleiro().get(situacao.getIdJogadorDaVez()));
+
+                    for(CasaTabuleiro casa : situacao.getTabuleiro().get(situacao.getIdJogadorDaVez())){
+                        System.out.println(casa.getPosicao());
+                        System.out.println(casa.getQtd());
+                        System.out.println(casa.getTipo());
+                    }
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Status> call, Throwable t) {
+                Toast.makeText(JogoPrincipal.this, "Erro Inesperado!", Toast.LENGTH_LONG).show();
+            }
+        });
+
+        // Cria objeto que sera chamado para obter as informacoes da mao jogador
+        ObterMaoJogador maoJogador = retrofit.create(ObterMaoJogador.class);
+
+        // Cria objeto que ira realizar a chamada e passa o ID e senha do jogador como parametro
+        //TODO Alterar os parametros IDJOGADOR e SENHAJOGADOR pelas variaveis idJogador e senhaJogador respectivamente
+        Call<List<Carta>> cartasJogador = maoJogador.getMaoJogador("243", "C1B427");
+        System.out.println("ID Jogador: " + idJogador);
+        System.out.println("Senha Jogador: " + senhaJogador);
+
+        //Enfilera chamada do webservice e configura o callback
+        cartasJogador.enqueue(new Callback<List<Carta>>() {
+            @Override
+            public void onResponse(Call<List<Carta>> call, Response<List<Carta>> response) {
+                if (!response.isSuccessful()){
+                    Toast.makeText(JogoPrincipal.this, "Deu erro: " + response.code(), Toast.LENGTH_LONG).show();
+                } else {
+                    List<Carta> cartas = response.body();
+
+                    for(Carta carta : cartas){
+                        System.out.println(carta.getTipo());
+                        System.out.println(carta.getQtd());
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Carta>> call, Throwable t) {
+                Toast.makeText(JogoPrincipal.this, "Erro Inesperado!", Toast.LENGTH_LONG).show();
+            }
+        });
+        /*
+        //Cria objeto que sera chamado para realizar ação de pular a vez
+        AcaoPularVez pularVez = retrofit.create(AcaoPularVez.class);
+
+        // Realiza a chamada e passa os parametros com as informações do jogador que ira realizar esta acao
+        // recebe como retorno o status atual da partida
+        statusAtual = pularVez.postPularVez(autenticacao);
+
+        statusAtual.enqueue(new Callback<Status>() {
+            @Override
+            public void onResponse(Call<Status> call, Response<Status> response) {
+                if (!response.isSuccessful()){
+                    Toast.makeText(JogoPrincipal.this, "Deu erro: " + response.code(), Toast.LENGTH_LONG).show();
+                } else {
+                    // Obtem as informacoes do servico e guarda em uma referencia de objeto
+                    Status situacao = response.body();
+
+                    System.out.println("Pulou a vez com sucesso!!!");
+                    System.out.println(situacao.getIdJogadorDaVez());
+                    System.out.println(situacao.getNumeroDaJogada());
+                    System.out.println(situacao.getTabuleiro().get(situacao.getIdJogadorDaVez()));
+
+                    for(CasaTabuleiro casa : situacao.getTabuleiro().get(situacao.getIdJogadorDaVez())){
+                        System.out.println(casa.getPosicao());
+                        System.out.println(casa.getQtd());
+                        System.out.println(casa.getTipo());
+                    }
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Status> call, Throwable t) {
+                Toast.makeText(JogoPrincipal.this, "Erro Inesperado!", Toast.LENGTH_LONG).show();
+            }
+        });
+        */
+        /*
+        //Cria objeto que sera chamado para realizar ação de andar para frente
+        AcaoAndarFrente andarFrente = retrofit.create(AcaoAndarFrente.class);
+
+        // Realiza a chamada e passa os parametros com as informações do jogador que ira realizar esta acao
+        // passa tambem posicao origem do pirata a ser movido para frente e a carta que sera utilizada
+        // recebe como retorno o status atual da partida
+        statusAtual = andarFrente.postAndarFrente(autenticacao, "0", "E");
+
+        statusAtual.enqueue(new Callback<Status>() {
+            @Override
+            public void onResponse(Call<Status> call, Response<Status> response) {
+                if (!response.isSuccessful()){
+                    Toast.makeText(JogoPrincipal.this, "Deu erro: " + response.code(), Toast.LENGTH_LONG).show();
+                } else {
+                    // Obtem as informacoes do servico e guarda em uma referencia de objeto
+                    Status situacao = response.body();
+
+                    System.out.println("Andou para frente com sucesso!!!");
+                    System.out.println(situacao.getIdJogadorDaVez());
+                    System.out.println(situacao.getNumeroDaJogada());
+                    System.out.println(situacao.getTabuleiro().get(situacao.getIdJogadorDaVez()));
+
+                    for(CasaTabuleiro casa : situacao.getTabuleiro().get(situacao.getIdJogadorDaVez())){
+                        System.out.println(casa.getPosicao());
+                        System.out.println(casa.getQtd());
+                        System.out.println(casa.getTipo());
+                    }
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Status> call, Throwable t) {
+                Toast.makeText(JogoPrincipal.this, "Erro Inesperado!", Toast.LENGTH_LONG).show();
+            }
+        });
+        */
+
+        //Cria objeto que sera chamado para realizar ação de andar para tras
+        AcaoAndarTras andartras = retrofit.create(AcaoAndarTras.class);
+
+        // Realiza a chamada e passa os parametros com as informações do jogador que ira realizar esta acao
+        // passa tambem posicao origem do pirata a ser movido para tras
+        // recebe como retorno o status atual da partida
+        statusAtual = andartras.postAndarTras(autenticacao, "6");
+
+        statusAtual.enqueue(new Callback<Status>() {
+            @Override
+            public void onResponse(Call<Status> call, Response<Status> response) {
+                if (!response.isSuccessful()){
+                    Toast.makeText(JogoPrincipal.this, "Deu erro: " + response.code(), Toast.LENGTH_LONG).show();
+
+                } else {
+                    // Obtem as informacoes do servico e guarda em uma referencia de objeto
+                    Status situacao = response.body();
+
+                    System.out.println("Andou para tras com sucesso!!!");
+                    System.out.println(situacao.getIdJogadorDaVez());
+                    System.out.println(situacao.getNumeroDaJogada());
+                    System.out.println(situacao.getTabuleiro().get(situacao.getIdJogadorDaVez()));
+
+                    for(CasaTabuleiro casa : situacao.getTabuleiro().get(situacao.getIdJogadorDaVez())){
+                        System.out.println(casa.getPosicao());
+                        System.out.println(casa.getQtd());
+                        System.out.println(casa.getTipo());
+                    }
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Status> call, Throwable t) {
+                Toast.makeText(JogoPrincipal.this, "Erro Inesperado!", Toast.LENGTH_LONG).show();
+            }
+        });
+
     }
 
+    // monta o tabuleiro de forma dinamica a partir da lista com as informacoes obtidas no servico
     private void montaTabuleiro(List<CasaTabuleiro> casas){
         int numCard = 1;
 
@@ -145,6 +338,7 @@ public class JogoPrincipal extends AppCompatActivity {
         }
     }
 
+    // Cria Card representando cada casa do tabuleiro
     private void addItem(ViewGroup container, String tipo,int num){
 
         CardView cardView = (CardView) LayoutInflater.from(this)
