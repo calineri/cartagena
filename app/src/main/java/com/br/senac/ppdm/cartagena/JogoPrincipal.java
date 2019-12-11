@@ -22,6 +22,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class JogoPrincipal extends AppCompatActivity {
 
+    private ViewGroup containerH0;
     private ViewGroup containerH1;
     private ViewGroup containerH2;
     private ViewGroup containerH3;
@@ -31,6 +32,7 @@ public class JogoPrincipal extends AppCompatActivity {
     private ViewGroup containerH7;
     private ViewGroup containerH8;
     private ViewGroup containerH9;
+    private ViewGroup containerH10;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +48,7 @@ public class JogoPrincipal extends AppCompatActivity {
         String nomeJogo = pref.getString("nomeJogo","");
         String senhaJogo = pref.getString("senhaJogo","");
 
+        containerH0 =  (ViewGroup) findViewById(R.id.containerH0);
         containerH1 =  (ViewGroup) findViewById(R.id.containerH1);
         containerH2 =  (ViewGroup) findViewById(R.id.containerH2);
         containerH3 =  (ViewGroup) findViewById(R.id.containerH3);
@@ -55,6 +58,7 @@ public class JogoPrincipal extends AppCompatActivity {
         containerH7 =  (ViewGroup) findViewById(R.id.containerH7);
         containerH8 =  (ViewGroup) findViewById(R.id.containerH8);
         containerH9 =  (ViewGroup) findViewById(R.id.containerH9);
+        containerH10 = (ViewGroup) findViewById(R.id.containerH10);
 
         // Cria os objetos que serao utilizados no POST nas mensagens que necessitam
         //TODO Alterar os parametros IDJOGADOR e SENHAJOGADOR pelas variaveis idJogador e senhaJogador respectivamente
@@ -280,10 +284,16 @@ public class JogoPrincipal extends AppCompatActivity {
             }
         });
 
+
+
     }
 
     // monta o tabuleiro de forma dinamica a partir da lista com as informacoes obtidas no servico
     private void montaTabuleiro(List<CasaTabuleiro> casas){
+
+        // Cria no mapa a prisao
+        criaPrisao();
+
         int numCard = 1;
 
         for(int j = 0; j < 4; j++){
@@ -338,6 +348,8 @@ public class JogoPrincipal extends AppCompatActivity {
             addItem(containerH9, casas.get(numCard).getTipo(),numCard++);
 
         }
+
+        criaBarco();
     }
 
     // Cria Card representando cada casa do tabuleiro
@@ -357,6 +369,8 @@ public class JogoPrincipal extends AppCompatActivity {
         imgJog1.setVisibility(View.INVISIBLE);
         imgJog2.setVisibility(View.INVISIBLE);
         imgJog3.setVisibility(View.INVISIBLE);
+        imgJog4.setVisibility(View.INVISIBLE);
+        imgJog5.setVisibility(View.INVISIBLE);
 
         numCard.setText(String.valueOf(num));
 
@@ -384,6 +398,91 @@ public class JogoPrincipal extends AppCompatActivity {
         }
 
         container.addView(cardView);
+
+    }
+
+    public void criaPrisao(){
+        CardView cardView = (CardView) LayoutInflater.from(this)
+                .inflate(R.layout.card_prisao, containerH0, false);
+
+        ImageView imgJog1Prisao1 = findViewById(R.id.imageJog1Prisao1);
+        ImageView imgJog1Prisao2 = findViewById(R.id.imageJog1Prisao2);
+        ImageView imgJog1Prisao3 = findViewById(R.id.imageJog1Prisao3);
+        ImageView imgJog1Prisao4 = findViewById(R.id.imageJog1Prisao4);
+        ImageView imgJog1Prisao5 = findViewById(R.id.imageJog1Prisao5);
+        ImageView imgJog1Prisao6 = findViewById(R.id.imageJog1Prisao6);
+
+        ImageView imgJog2Prisao1 = findViewById(R.id.imageJog2Prisao1);
+        ImageView imgJog2Prisao2 = findViewById(R.id.imageJog2Prisao2);
+        ImageView imgJog2Prisao3 = findViewById(R.id.imageJog2Prisao3);
+        ImageView imgJog2Prisao4 = findViewById(R.id.imageJog2Prisao4);
+        ImageView imgJog2Prisao5 = findViewById(R.id.imageJog2Prisao5);
+        ImageView imgJog2Prisao6 = findViewById(R.id.imageJog2Prisao6);
+
+        ImageView imgJog3Prisao1 = findViewById(R.id.imageJog3Prisao1);
+        ImageView imgJog3Prisao2 = findViewById(R.id.imageJog3Prisao2);
+        ImageView imgJog3Prisao3 = findViewById(R.id.imageJog3Prisao3);
+        ImageView imgJog3Prisao4 = findViewById(R.id.imageJog3Prisao4);
+        ImageView imgJog3Prisao5 = findViewById(R.id.imageJog3Prisao5);
+        ImageView imgJog3Prisao6 = findViewById(R.id.imageJog3Prisao6);
+
+        ImageView imgJog4Prisao1 = findViewById(R.id.imageJog4Prisao1);
+        ImageView imgJog4Prisao2 = findViewById(R.id.imageJog4Prisao2);
+        ImageView imgJog4Prisao3 = findViewById(R.id.imageJog4Prisao3);
+        ImageView imgJog4Prisao4 = findViewById(R.id.imageJog4Prisao4);
+        ImageView imgJog4Prisao5 = findViewById(R.id.imageJog4Prisao5);
+        ImageView imgJog4Prisao6 = findViewById(R.id.imageJog4Prisao6);
+
+        ImageView imgJog5Prisao1 = findViewById(R.id.imageJog5Prisao1);
+        ImageView imgJog5Prisao2 = findViewById(R.id.imageJog5Prisao2);
+        ImageView imgJog5Prisao3 = findViewById(R.id.imageJog5Prisao3);
+        ImageView imgJog5Prisao4 = findViewById(R.id.imageJog5Prisao4);
+        ImageView imgJog5Prisao5 = findViewById(R.id.imageJog5Prisao5);
+        ImageView imgJog5Prisao6 = findViewById(R.id.imageJog5Prisao6);
+
+        containerH0.addView(cardView);
+    }
+
+    public void criaBarco(){
+        CardView cardView = (CardView) LayoutInflater.from(this)
+                .inflate(R.layout.card_barco, containerH10, false);
+
+        ImageView imgJog1Barco1 = findViewById(R.id.imageJog1Barco1);
+        ImageView imgJog1Barco2 = findViewById(R.id.imageJog1Barco2);
+        ImageView imgJog1Barco3 = findViewById(R.id.imageJog1Barco3);
+        ImageView imgJog1Barco4 = findViewById(R.id.imageJog1Barco4);
+        ImageView imgJog1Barco5 = findViewById(R.id.imageJog1Barco5);
+        ImageView imgJog1Barco6 = findViewById(R.id.imageJog1Barco6);
+
+        ImageView imgJog2Barco1 = findViewById(R.id.imageJog2Barco1);
+        ImageView imgJog2Barco2 = findViewById(R.id.imageJog2Barco2);
+        ImageView imgJog2Barco3 = findViewById(R.id.imageJog2Barco3);
+        ImageView imgJog2Barco4 = findViewById(R.id.imageJog2Barco4);
+        ImageView imgJog2Barco5 = findViewById(R.id.imageJog2Barco5);
+        ImageView imgJog2Barco6 = findViewById(R.id.imageJog2Barco6);
+
+        ImageView imgJog3Barco1 = findViewById(R.id.imageJog3Barco1);
+        ImageView imgJog3Barco2 = findViewById(R.id.imageJog3Barco2);
+        ImageView imgJog3Barco3 = findViewById(R.id.imageJog3Barco3);
+        ImageView imgJog3Barco4 = findViewById(R.id.imageJog3Barco4);
+        ImageView imgJog3Barco5 = findViewById(R.id.imageJog3Barco5);
+        ImageView imgJog3Barco6 = findViewById(R.id.imageJog3Barco6);
+
+        ImageView imgJog4Barco1 = findViewById(R.id.imageJog4Barco1);
+        ImageView imgJog4Barco2 = findViewById(R.id.imageJog4Barco2);
+        ImageView imgJog4Barco3 = findViewById(R.id.imageJog4Barco3);
+        ImageView imgJog4Barco4 = findViewById(R.id.imageJog4Barco4);
+        ImageView imgJog4Barco5 = findViewById(R.id.imageJog4Barco5);
+        ImageView imgJog4Barco6 = findViewById(R.id.imageJog4Barco6);
+
+        ImageView imgJog5Barco1 = findViewById(R.id.imageJog5Barco1);
+        ImageView imgJog5Barco2 = findViewById(R.id.imageJog5Barco2);
+        ImageView imgJog5Barco3 = findViewById(R.id.imageJog5Barco3);
+        ImageView imgJog5Barco4 = findViewById(R.id.imageJog5Barco4);
+        ImageView imgJog5Barco5 = findViewById(R.id.imageJog5Barco5);
+        ImageView imgJog5Barco6 = findViewById(R.id.imageJog5Barco6);
+
+        containerH10.addView(cardView);
 
     }
 }
