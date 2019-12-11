@@ -1,8 +1,10 @@
 package com.br.senac.ppdm.cartagena;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -115,6 +117,29 @@ public class JogoPrincipal extends AppCompatActivity {
         // Realiza a acao do jogador de "andar para tras"
         //andarParaTras(retrofit);
 
+        fabButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent =new Intent(JogoPrincipal.this, AcaoJogador.class);
+                startActivityForResult(intent, 1);
+            }
+        });
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1) {
+            if (resultCode == RESULT_OK) {
+
+                if (data.getStringExtra("acao") == "F") {
+
+                }
+
+
+            }
+        }
     }
 
     private void andarParaTras(Retrofit retrofit){
@@ -322,7 +347,7 @@ public class JogoPrincipal extends AppCompatActivity {
         ObterConfTabuleiro confTabuleiro = retrofit.create(ObterConfTabuleiro.class);
 
         // Cria objeto que ira realizar a chamada e passa o ID da partida como parametro
-        Call<List<CasaTabuleiro>> casaTabuleiro = confTabuleiro.getConfTabuleiro("154");
+        Call<List<CasaTabuleiro>> casaTabuleiro = confTabuleiro.getConfTabuleiro(this.idJogo);
 
         // Enfilera chamada do webservice e configura o callback
         casaTabuleiro.enqueue(new Callback<List<CasaTabuleiro>>() {
