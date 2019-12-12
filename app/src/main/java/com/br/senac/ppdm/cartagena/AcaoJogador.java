@@ -40,7 +40,7 @@ public class AcaoJogador extends AppCompatActivity {
 
         btnContinuar = findViewById(R.id.btnContinuar);
 
-        btnContinuar.setOnClickListener(new View.OnClickListener() {
+        View.OnClickListener listener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (rbAndarFrente.isChecked()){
@@ -63,9 +63,11 @@ public class AcaoJogador extends AppCompatActivity {
                     returnIntent.putExtra("acao","P");
                     setResult(RESULT_OK,returnIntent);
                 }
-
+                finish();
             }
-        });
+        };
+
+        btnContinuar.setOnClickListener(listener);
 
     }
 }

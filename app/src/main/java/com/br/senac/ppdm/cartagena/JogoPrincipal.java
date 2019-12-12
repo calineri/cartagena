@@ -45,6 +45,11 @@ public class JogoPrincipal extends AppCompatActivity {
     private String nomeJogo;
     private String senhaJogo;
 
+    private Retrofit retrofit;
+
+    private String posPirata;
+    private String cartaAndarFrente;
+
     private FloatingActionButton fabButton;
 
     // Variavel que contem o status atual do jogo
@@ -71,9 +76,9 @@ public class JogoPrincipal extends AppCompatActivity {
         this.senhaJogo = pref.getString("senhaJogo","");
 
         // APENAS PARA TESTES, RETIRAR NA VERSAO FINAL
-        this.idJogo = "154";
-        this.idJogador = "244";
-        this.senhaJogador = "DFDEF8";
+        //this.idJogo = "154";
+        //this.idJogador = "243";
+        //this.senhaJogador = "C1B427";
         // APENAS PARA TESTES, RETIRAR NA VERSAO FINAL
 
         this.autenticacao = new Autenticacao(Long.parseLong(idJogador), senhaJogador);
@@ -93,7 +98,7 @@ public class JogoPrincipal extends AppCompatActivity {
         this.fabButton = (FloatingActionButton) findViewById(R.id.fabEdit);
 
         // Cria objeto Retrofit que sera utilizado em todas as chamadas webservice
-        Retrofit retrofit = new Retrofit.Builder()
+        this.retrofit = new Retrofit.Builder()
                 .baseUrl("https://kingme.azurewebsites.net/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
@@ -120,7 +125,7 @@ public class JogoPrincipal extends AppCompatActivity {
         fabButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent =new Intent(JogoPrincipal.this, AcaoJogador.class);
+                Intent intent = new Intent(JogoPrincipal.this, AcaoJogador.class);
                 startActivityForResult(intent, 1);
             }
         });
@@ -129,20 +134,34 @@ public class JogoPrincipal extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+
+        System.out.println("Request code: " + requestCode);
+        System.out.println("Result code: " + resultCode);
         if (requestCode == 1) {
             if (resultCode == RESULT_OK) {
 
-                if (data.getStringExtra("acao") == "F") {
-
+                if (data.getStringExtra("acao").equals("F")) {
+                    this.posPirata = data.getStringExtra("posicao");
+                    this.cartaAndarFrente = data.getStringExtra("carta");
+                    andarParaFrente(this.retrofit, this.posPirata, this.cartaAndarFrente);
                 }
 
+                if (data.getStringExtra("acao").equals("T")) {
+                    this.posPirata = data.getStringExtra("posicao");
+                    andarParaTras(this.retrofit, this.posPirata);
+                }
 
+                if (data.getStringExtra("acao").equals("P")) {
+                    pularVez(this.retrofit);
+                }
+
+            } else{
+                super.onActivityResult(requestCode, resultCode, data);
             }
         }
     }
 
-    private void andarParaTras(Retrofit retrofit){
+    private void andarParaTras(Retrofit retrofit, String pos){
 
         //Cria objeto que sera chamado para realizar ação de andar para tras
         AcaoAndarTras andartras = retrofit.create(AcaoAndarTras.class);
@@ -150,8 +169,7 @@ public class JogoPrincipal extends AppCompatActivity {
         // Realiza a chamada e passa os parametros com as informações do jogador que ira realizar esta acao
         // passa tambem posicao origem do pirata a ser movido para tras
         // recebe como retorno o status atual da partida
-        // TODO Alterar a posicao origem do pirata por variavel que sera escolhida na tela
-        this.statusAtual = andartras.postAndarTras(this.autenticacao, "6");
+        this.statusAtual = andartras.postAndarTras(this.autenticacao, pos);
 
         this.statusAtual.enqueue(new Callback<Status>() {
             @Override
@@ -184,7 +202,7 @@ public class JogoPrincipal extends AppCompatActivity {
         });
     }
 
-    private void andarParaFrente(Retrofit retrofit){
+    private void andarParaFrente(Retrofit retrofit, String pos, String carta){
 
         //Cria objeto que sera chamado para realizar ação de andar para frente
         AcaoAndarFrente andarFrente = retrofit.create(AcaoAndarFrente.class);
@@ -192,8 +210,7 @@ public class JogoPrincipal extends AppCompatActivity {
         // Realiza a chamada e passa os parametros com as informações do jogador que ira realizar esta acao
         // passa tambem posicao origem do pirata a ser movido para frente e a carta que sera utilizada
         // recebe como retorno o status atual da partida
-        // TODO Alterar a posicao origem do pirata e a carta a ser utilizada por variaveis que serao escolhidas na tela
-        this.statusAtual = andarFrente.postAndarFrente(this.autenticacao, "0", "E");
+        this.statusAtual = andarFrente.postAndarFrente(this.autenticacao, pos, carta);
 
         this.statusAtual.enqueue(new Callback<Status>() {
             @Override
